@@ -18,7 +18,7 @@
     <item>
      <layout class="QVBoxLayout" name="leftLayout">
       <item>
-       <widget class="QWidget" name="Lecteur" native="true">
+       <widget class="QVideoWidget" name="Lecteur" native="true">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>0</horstretch>
@@ -251,6 +251,14 @@
    <addaction name="menuAide"/>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QVideoWidget</class>
+   <extends>QWidget</extends>
+   <header>PySide2.QtMultimediaWidgets</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
