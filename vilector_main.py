@@ -1,7 +1,7 @@
 import sys
-from PySide2.QtWidgets import QApplication, QMainWindow
+from PySide2.QtWidgets import QApplication, QMainWindow, QFileDialog
 from ui_vilector import Ui_MainWindow
-from PySide2.QtCore import QUrl
+from PySide2.QtCore import QUrl, QTime
 from PySide2.QtMultimedia import QMediaPlayer, QMediaContent
 
 class MainWindow(QMainWindow):
@@ -16,12 +16,19 @@ class MainWindow(QMainWindow):
         self.ui.pBPrecedent.clicked.connect (self.precedent)
         self.ui.pBSuivant.clicked.connect (self.suivant)
 
+        self.ui.pBAjout.clicked.connect(self.ajoutListe)
+        self.ui.pBSupp.clicked.connect(self.suppListe)
+
         self.ui.dBVolume.valueChanged.connect(self.volume)
         self.ui.dBVolume.setRange(0, 100)
         self.ui.suiviVol.setText(f'{str(self.ui.dBVolume.value())} %')
+        self.ui.sTpsCourant.valueChanged.connect(self.avanceSlider)
 
         self.mediaPlayer = QMediaPlayer()
         self.mediaPlayer.setVideoOutput(self.ui.Lecteur)
+
+        self.mediaPlayer.durationChanged.connect(self.duree)
+        self.mediaPlayer.positionChanged.connect(self.avancee)
 
         mediaContent = QMediaContent(QUrl.fromLocalFile("big_buck_bunny.avi"))
         self.mediaPlayer.setMedia(mediaContent)
@@ -29,7 +36,6 @@ class MainWindow(QMainWindow):
     def lecture(self) :
         print("Lecture")
         self.mediaPlayer.play()
-
 
     def pause(self):
         print ("Pause")
@@ -44,12 +50,44 @@ class MainWindow(QMainWindow):
 
     def precedent(self):
         print ("Précédent")
+
     def suivant(self):
         print ("Suivant")
+
+    def ajoutListe (self):
+        print("Ajout dans playlist")
+        result=QFileDialog.getOpenFileName(self, "/home")
+        self.ui.listWidget.addItem(result[0])
+
+    def suppListe (self):
+        print ("Supprimer de playList")
 
     def volume(self):
         self.mediaPlayer.setVolume(self.ui.dBVolume.value())
         self.ui.suiviVol.setText(f'{str(self.ui.dBVolume.value())} %')
+
+    def duree(self):
+        mediaDuration=self.mediaPlayer.duration()
+        self.ui.sTpsCourant.setRange(0, mediaDuration)
+        totalTimeMedia = QTime(0,0,0)
+        totalTimeMedia = totalTimeMedia.addMSecs(mediaDuration)
+        self.ui.lRestantTps.setText(totalTimeMedia.toString("HH:mm:ss"))
+
+    def avancee(self):
+        self.ui.sTpsCourant.valueChanged.disconnect(self.avanceSlider)
+        mediaPosition = self.mediaPlayer.position()
+        currentTimeMedia = QTime(0,0,0)
+        currentTimeMedia = currentTimeMedia.addMSecs(mediaPosition)
+        self.ui.lAvanceeTps.setText(currentTimeMedia.toString("HH:mm:ss"))
+        self.ui.sTpsCourant.setValue(mediaPosition)
+        self.ui.sTpsCourant.valueChanged.connect(self.avanceSlider)
+
+    def avanceSlider (self):
+        self.mediaPlayer.positionChanged.disconnect(self.avancee)
+        self.mediaPlayer.setPosition(self.ui.sTpsCourant.sliderPosition())
+        self.mediaPlayer.positionChanged.connect(self.avancee)
+
+
 
 
 if __name__ == "__main__":
