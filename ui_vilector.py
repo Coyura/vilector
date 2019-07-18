@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'vilectorDesign.ui',
 # licensing of 'vilectorDesign.ui' applies.
 #
-# Created: Thu Jul 18 09:53:51 2019
+# Created: Thu Jul 18 11:29:46 2019
 #      by: pyside2-uic  running on PySide2 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
@@ -20,7 +20,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_5.setObjectName("horizontalLayout_5")
         self.leftLayout = QtWidgets.QVBoxLayout()
         self.leftLayout.setObjectName("leftLayout")
-        self.Lecteur = QtWidgets.QWidget(self.centralwidget)
+        self.Lecteur = QVideoWidget(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -150,3 +150,4 @@ class Ui_MainWindow(object):
         self.menuFichier.setTitle(QtWidgets.QApplication.translate("MainWindow", "Fichier", None, -1))
         self.menuAide.setTitle(QtWidgets.QApplication.translate("MainWindow", "Aide", None, -1))
 
+from PySide2.QtMultimediaWidgets import QVideoWidget
