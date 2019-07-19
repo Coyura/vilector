@@ -1,7 +1,7 @@
 import sys
 from PySide2.QtWidgets import QApplication, QMainWindow, QFileDialog, QListWidgetItem
 from ui_vilector import Ui_MainWindow
-from PySide2.QtCore import QUrl, QTime
+from PySide2.QtCore import QUrl, QTime , QFileInfo
 from PySide2.QtMultimedia import QMediaPlayer, QMediaContent
 
 class MainWindow(QMainWindow):
@@ -31,12 +31,15 @@ class MainWindow(QMainWindow):
         self.mediaPlayer.durationChanged.connect(self.duree)
         self.mediaPlayer.positionChanged.connect(self.avancee)
 
-        mediaContent = QMediaContent(QUrl.fromLocalFile("big_buck_bunny.avi"))
-        self.mediaPlayer.setMedia(mediaContent)
+        # mediaContent = QMediaContent(QUrl.fromLocalFile("big_buck_bunny.avi"))
+        # self.mediaPlayer.setMedia(mediaContent)
 
     def lecture(self) :
         print("Lecture")
-        self.mediaPlayer.play()
+        if self.mediaPlayer.state() == QMediaPlayer.StoppedState :
+            self.mediaSelected()
+        else :
+            self.mediaPlayer.play()
 
     def pause(self):
         print ("Pause")
@@ -50,15 +53,36 @@ class MainWindow(QMainWindow):
         self.mediaPlayer.stop()
 
     def precedent(self):
+        currentItemRow = self.ui.listWidget.currentRow()
+        if currentItemRow == -1 :
+            return
+        totalItems = self.ui.listWidget.count()
+        self.ui.listWidget.setCurrentRow((currentItemRow-1)%totalItems)
+        self.mediaSelected()
         print ("Précédent")
 
     def suivant(self):
+        currentItemRow = self.ui.listWidget.currentRow()
+        if currentItemRow == -1 :
+            return
+        totalItems = self.ui.listWidget.count()
+        self.ui.listWidget.setCurrentRow((currentItemRow+1)%totalItems)
+        self.mediaSelected()
         print ("Suivant")
+
+    # def ajoutListe (self):
+    #     print("Ajout dans playlist")
+    #     newFile=QFileDialog.getOpenFileName(self, "Choix Film", "/home", "Movie Files (*.avi, *.mp4)")
+    #     newMovie=QListWidgetItem(newFile[0])
+    #     self.ui.listWidget.addItem(newMovie)
 
     def ajoutListe (self):
         print("Ajout dans playlist")
         newFile=QFileDialog.getOpenFileName(self, "Choix Film", "/home", "Movie Files (*.avi, *.mp4)")
-        newMovie=QListWidgetItem(newFile[0])
+        fInfo=QFileInfo(newFile[0])
+        fShortName=fInfo.baseName()
+        newMovie=QListWidgetItem(fShortName)
+        newMovie.setToolTip(newFile[0])
         self.ui.listWidget.addItem(newMovie)
 
     def suppListe (self):
@@ -67,11 +91,17 @@ class MainWindow(QMainWindow):
         if rowItem != -1 :
             self.ui.listWidget.takeItem(rowItem)
 
+    # def mediaSelected (self):
+    #     currentItem = self.ui.listWidget.currentItem()
+    #     mediaContent = QMediaContent(QUrl.fromLocalFile(currentItem.text()))
+    #     self.mediaPlayer.setMedia(mediaContent)
+    #     self.lecture()
+
     def mediaSelected (self):
         currentItem = self.ui.listWidget.currentItem()
-        mediaContent = QMediaContent(QUrl.fromLocalFile(currentItem.text()))
+        mediaContent = QMediaContent(QUrl.fromLocalFile(currentItem.toolTip()))
         self.mediaPlayer.setMedia(mediaContent)
-        self.lecture()
+        self.mediaPlayer.play()
 
     def volume(self):
         self.mediaPlayer.setVolume(self.ui.dBVolume.value())
