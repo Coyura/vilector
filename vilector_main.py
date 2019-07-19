@@ -1,5 +1,5 @@
 import sys
-from PySide2.QtWidgets import QApplication, QMainWindow, QFileDialog
+from PySide2.QtWidgets import QApplication, QMainWindow, QFileDialog, QListWidgetItem
 from ui_vilector import Ui_MainWindow
 from PySide2.QtCore import QUrl, QTime
 from PySide2.QtMultimedia import QMediaPlayer, QMediaContent
@@ -18,6 +18,7 @@ class MainWindow(QMainWindow):
 
         self.ui.pBAjout.clicked.connect(self.ajoutListe)
         self.ui.pBSupp.clicked.connect(self.suppListe)
+        self.ui.listWidget.itemDoubleClicked.connect(self.mediaSelected)
 
         self.ui.dBVolume.valueChanged.connect(self.volume)
         self.ui.dBVolume.setRange(0, 100)
@@ -56,11 +57,21 @@ class MainWindow(QMainWindow):
 
     def ajoutListe (self):
         print("Ajout dans playlist")
-        result=QFileDialog.getOpenFileName(self, "/home")
-        self.ui.listWidget.addItem(result[0])
+        newFile=QFileDialog.getOpenFileName(self, "Choix Film", "/home", "Movie Files (*.avi, *.mp4)")
+        newMovie=QListWidgetItem(newFile[0])
+        self.ui.listWidget.addItem(newMovie)
 
     def suppListe (self):
         print ("Supprimer de playList")
+        rowItem = self.ui.listWidget.currentRow()
+        if rowItem != -1 :
+            self.ui.listWidget.takeItem(rowItem)
+
+    def mediaSelected (self):
+        currentItem = self.ui.listWidget.currentItem()
+        mediaContent = QMediaContent(QUrl.fromLocalFile(currentItem.text()))
+        self.mediaPlayer.setMedia(mediaContent)
+        self.lecture()
 
     def volume(self):
         self.mediaPlayer.setVolume(self.ui.dBVolume.value())
